@@ -48,8 +48,10 @@ import androidx.core.content.FileProvider;
 public final class FileIO {
 	private static final String DEFAULT_FILENAME_TIME_FORMAT = "yyyy_MM_dd_hhmmss";
 	private static final String ENDING = ".png";
-	private static final int COMPRESS_QUALITY = 100;
-	private static final Bitmap.CompressFormat COMPRESS_FORMAT = Bitmap.CompressFormat.PNG;
+	private static final int COMPRESS_QUALITY = 90;
+	private static final Bitmap.CompressFormat COMPRESS_FORMAT_PNG = Bitmap.CompressFormat.PNG;
+	private static final Bitmap.CompressFormat COMPRESS_FORMAT_JPEG = Bitmap.CompressFormat.JPEG;
+	private static final Bitmap.CompressFormat COMPRESS_FORMAT_WEBP = Bitmap.CompressFormat.WEBP;
 
 	private FileIO() {
 		throw new AssertionError();
@@ -60,7 +62,7 @@ public final class FileIO {
 			throw new IllegalArgumentException("Bitmap is invalid");
 		}
 
-		if (!bitmap.compress(COMPRESS_FORMAT, COMPRESS_QUALITY, outputStream)) {
+		if (!bitmap.compress(COMPRESS_FORMAT_WEBP, COMPRESS_QUALITY, outputStream)) {
 			throw new IOException("Can not write png to stream.");
 		}
 	}
@@ -91,7 +93,7 @@ public final class FileIO {
 
 			imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
 			fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
-			bitmap.compress(COMPRESS_FORMAT, COMPRESS_QUALITY, fos);
+			bitmap.compress(COMPRESS_FORMAT_PNG, COMPRESS_QUALITY, fos);
 
 			Objects.requireNonNull(fos, "Can't create fileoutputstream!");
 			fos.close();
