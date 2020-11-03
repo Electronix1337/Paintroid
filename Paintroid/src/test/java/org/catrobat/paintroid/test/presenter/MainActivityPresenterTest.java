@@ -498,6 +498,20 @@ public class MainActivityPresenterTest {
 	}
 
 	@Test
+	public void testSaveCopyConfirmCLickedThenSaveImage() {
+		presenter.saveCopyConfirmClicked(0);
+
+		verify(interactor).saveCopy(presenter, 0, bitmap);
+	}
+
+	@Test
+	public void testSaveCopyConfirmClickedThenUseRequestCode() {
+		presenter.saveCopyConfirmClicked(-1);
+
+		verify(interactor).saveCopy(presenter, -1, bitmap);
+	}
+
+	@Test
 	public void testUndoClickedWhenKeyboardOpenedThenCloseKeyboard() {
 		when(view.isKeyboardShown()).thenReturn(true);
 

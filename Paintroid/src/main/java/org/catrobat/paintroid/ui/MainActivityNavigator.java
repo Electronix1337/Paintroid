@@ -171,7 +171,7 @@ public class MainActivityNavigator implements MainActivityContracts.Navigator {
 	@Override
 	public void startLoadImageActivity(@ActivityRequestCode int requestCode) {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		intent.setType("image/*");
+		intent.setType("*/*");
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
 		mainActivity.startActivityForResult(intent, requestCode);
 	}

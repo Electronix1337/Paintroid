@@ -26,9 +26,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.catrobat.paintroid.FileIO;
+import org.catrobat.paintroid.tools.Workspace;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import androidx.annotation.Nullable;
 
@@ -38,14 +40,14 @@ public class SaveImageAsync extends AsyncTask<Void, Void, Uri> {
 	private int requestCode;
 	private Uri uri;
 	private boolean saveAsCopy;
-	private Bitmap bitmap;
+	private Workspace workspace;
 
-	public SaveImageAsync(SaveImageCallback activity, int requestCode, Bitmap bitmap, @Nullable Uri uri, boolean saveAsCopy) {
+	public SaveImageAsync(SaveImageCallback activity, int requestCode, Workspace workspace, @Nullable Uri uri, boolean saveAsCopy) {
 		this.callbackRef = new WeakReference<>(activity);
 		this.requestCode = requestCode;
 		this.uri = uri;
 		this.saveAsCopy = saveAsCopy;
-		this.bitmap = bitmap;
+		this.workspace = workspace;
 	}
 
 	@Override
@@ -63,11 +65,24 @@ public class SaveImageAsync extends AsyncTask<Void, Void, Uri> {
 		SaveImageCallback callback = callbackRef.get();
 		if (callback != null && !callback.isFinishing()) {
 			try {
-				if (uri != null) {
-					return FileIO.saveBitmapToUri(uri, callback.getContentResolver(), bitmap);
+				if (FileIO.isCatrobatImage) {
+					List<Bitmap> bitmapList = workspace.getBitmapLisOfAllLayers();
+					CatrobatImage catrobatImage = new CatrobatImage(bitmapList);
+
+					if (uri != null) {
+						return FileIO.saveStringInputToFile(catrobatImage.buildJsonString(), uri, callback.getContentResolver());
+					} else {
+						return FileIO.createNewFileWithFileInternalFormat(catrobatImage.buildJsonString(), callback.getContentResolver());
+					}
 				} else {
-					String fileName = FileIO.getDefaultFileName();
-					return FileIO.saveBitmapToFile(fileName, bitmap, callback.getContentResolver());
+					Bitmap bitmap = workspace.getBitmapOfAllLayers();
+
+					if (uri != null) {
+						return FileIO.saveBitmapToUri(uri, callback.getContentResolver(), bitmap);
+					} else {
+						String fileName = FileIO.getDefaultFileName();
+						return FileIO.saveBitmapToFile(fileName, bitmap, callback.getContentResolver());
+					}
 				}
 			} catch (IOException e) {
 				Log.d(TAG, "Can't save image file", e);

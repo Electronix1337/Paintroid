@@ -31,6 +31,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import org.catrobat.paintroid.common.Constants;
+import org.catrobat.paintroid.iotasks.CatrobatImage;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,6 +40,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -50,6 +52,7 @@ public final class FileIO {
 	private static final String ENDING = ".png";
 	private static final int COMPRESS_QUALITY = 100;
 	private static final Bitmap.CompressFormat COMPRESS_FORMAT = Bitmap.CompressFormat.PNG;
+	public static boolean isCatrobatImage = true;
 
 	private FileIO() {
 		throw new AssertionError();
@@ -108,6 +111,84 @@ public final class FileIO {
 				outputStream.close();
 			}
 			imageUri = Uri.fromFile(file);
+		}
+
+		return imageUri;
+	}
+
+	public static Uri saveStringInputToFile(String input, Uri uri, ContentResolver resolver) throws IOException {
+		OutputStream streamToOverWrite = resolver.openOutputStream(uri);
+
+		if (streamToOverWrite == null) {
+			throw new IllegalArgumentException("Can not open uri.");
+		}
+
+		if (input == null) {
+			throw new IllegalArgumentException("Input is empty.");
+		}
+
+		try {
+			streamToOverWrite.write(input.getBytes());
+		} finally {
+			streamToOverWrite.close();
+		}
+
+		return uri;
+	}
+
+	public static Uri createNewFileWithFileInternalFormat(String input, ContentResolver resolver) throws IOException {
+		String fileName = "test3" + ".catrobat-image";
+
+		OutputStream fos;
+		Uri imageUri;
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			ContentValues contentValues = new ContentValues();
+			contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+			contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+			contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/catrobat-image");
+
+			imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+			fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+			try {
+				fos.write(input.getBytes());
+				Objects.requireNonNull(fos, "Can't create fileoutputstream!");
+			} finally {
+				fos.close();
+			}
+		} else {
+			if (!(Constants.MEDIA_DIRECTORY.exists() || Constants.MEDIA_DIRECTORY.mkdirs())) {
+				throw new IOException("Can not create media directory.");
+			}
+
+			File tempfile = new File(Constants.MEDIA_DIRECTORY, fileName);
+			OutputStream tempstream = new FileOutputStream(tempfile);
+			try {
+				tempstream.write(input.getBytes());
+				Objects.requireNonNull(tempstream, "Can't create fileoutputstream!");
+			} finally {
+				tempstream.close();
+			}
+
+			ContentValues contentValues = new ContentValues();
+			contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+			contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/catrobat-image");
+
+			contentValues.put(MediaStore.Images.Media.SIZE, tempfile.length());
+			tempfile.delete();
+
+			long date = System.currentTimeMillis();
+			contentValues.put(MediaStore.MediaColumns.DATE_MODIFIED, date / 1000);
+
+			imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+			fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+
+			try {
+				fos.write(input.getBytes());
+				Objects.requireNonNull(fos, "Can't create fileoutputstream!");
+			} finally {
+				fos.close();
+			}
 		}
 
 		return imageUri;
@@ -173,6 +254,25 @@ public final class FileIO {
 			sampleSize *= 2;
 		}
 		return sampleSize;
+	}
+
+	public static List<Bitmap> getBitmapListFromUri(Uri uri, ContentResolver resolver) throws IOException {
+		InputStream inputStream = resolver.openInputStream(uri);
+
+		if (inputStream == null) {
+			throw new IllegalArgumentException("Can not open uri.");
+		}
+
+		int i = inputStream.read();
+		StringBuilder output = new StringBuilder();
+		while (i != -1) {
+			output.append((char) i);
+			i = inputStream.read();
+		}
+
+		CatrobatImage catrobatImage = CatrobatImage.convertToCatrobatImageObjectFromJson(output.toString());
+
+		return catrobatImage.parseStringListToBitmapList();
 	}
 
 	public static Bitmap getBitmapFromUri(ContentResolver resolver, @NonNull Uri bitmapUri) throws IOException {
