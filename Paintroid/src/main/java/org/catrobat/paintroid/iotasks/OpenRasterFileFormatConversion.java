@@ -19,8 +19,13 @@
 
 package org.catrobat.paintroid.iotasks;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import org.catrobat.paintroid.common.Constants;
@@ -34,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -60,10 +66,38 @@ public class OpenRasterFileFormatConversion {
     private static final String TAG = OpenRasterFileFormatConversion.class.getSimpleName();
 
 
-    public static Uri exportToOraFile(List<Bitmap> bitmapList, String fileName, Bitmap bitmapAllLayers) throws IOException {
+    public static Uri exportToOraFile(List<Bitmap> bitmapList, String fileName, Bitmap bitmapAllLayers, ContentResolver resolver) throws IOException {
 
-        File file = new File(Constants.MEDIA_DIRECTORY, fileName);
-        OutputStream outputStream = new FileOutputStream(file);
+        Uri imageUri;
+        OutputStream outputStream;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/openraster");
+
+            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            outputStream = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+        } else {
+            File file = new File(Constants.MEDIA_DIRECTORY, fileName);
+            outputStream = new FileOutputStream(file);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/catrobat-image");
+
+            long date = System.currentTimeMillis();
+            contentValues.put(MediaStore.MediaColumns.DATE_MODIFIED, date / 1000);
+
+            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+//            fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+//
+//
+//
+//
+            imageUri = Uri.fromFile(file);
+        }
 
         ZipOutputStream streamZip = new ZipOutputStream(outputStream);
         ZipEntry mimetypeEntry = new ZipEntry("mimetype");
@@ -106,7 +140,9 @@ public class OpenRasterFileFormatConversion {
         streamZip.putNextEntry(new ZipEntry("mergedimage.png"));
         streamZip.write(bitmapByteArray, 0, bitmapByteArray.length);
 
-        return Uri.fromFile(file);
+        outputStream.close();
+
+        return imageUri;
     }
 
     private static byte[] getXmlStack(List<Bitmap> bitmapList) {
@@ -135,8 +171,14 @@ public class OpenRasterFileFormatConversion {
 
             for(int i = bitmapList.size()-1; i >= 0; i--) {
                 Element layer = doc.createElement("layer");
+//                Attr attr4 = doc.createAttribute("name");
+//                Attr attr5 = doc.createAttribute("src");
+//                layer.setAttributeNode(attr4);
+//                layer.setAttributeNode(attr5);
+
                 layer.setAttribute("name", "layer" + i);
                 layer.setAttribute("src", "data/layer" + i + ".png");
+                stack.appendChild(layer);
             }
 
 
