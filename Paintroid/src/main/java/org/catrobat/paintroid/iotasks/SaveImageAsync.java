@@ -65,17 +65,14 @@ public class SaveImageAsync extends AsyncTask<Void, Void, Uri> {
 		SaveImageCallback callback = callbackRef.get();
 		if (callback != null && !callback.isFinishing()) {
 			try {
+				Bitmap bitmap = workspace.getBitmapOfAllLayers();
+
 				if (FileIO.isCatrobatImage) {
 					List<Bitmap> bitmapList = workspace.getBitmapLisOfAllLayers();
 					CatrobatImage catrobatImage = new CatrobatImage(bitmapList);
 
-					if (uri != null) {
-						return FileIO.saveStringInputToFile(catrobatImage.buildJsonString(), uri, callback.getContentResolver());
-					} else {
-						return FileIO.createNewFileWithFileInternalFormat(catrobatImage.buildJsonString(), callback.getContentResolver());
-					}
+					return OpenRasterFileFormatConversion.exportToOraFile(bitmapList, "test", bitmap);
 				} else {
-					Bitmap bitmap = workspace.getBitmapOfAllLayers();
 
 					if (uri != null) {
 						return FileIO.saveBitmapToUri(uri, callback.getContentResolver(), bitmap);
