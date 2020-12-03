@@ -68,11 +68,13 @@ public class OpenRasterFileFormatConversion {
 
     public static Uri exportToOraFile(List<Bitmap> bitmapList, String fileName, Bitmap bitmapAllLayers, ContentResolver resolver) throws IOException {
 
-        Uri imageUri;
+        Uri imageUri = null;
         OutputStream outputStream;
+        ContentValues contentValues = new ContentValues();
+        float wholeSize = 0;
+        File file = new File(Constants.MEDIA_DIRECTORY, fileName);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ContentValues contentValues = new ContentValues();
             contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
             contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
             contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/openraster");
@@ -80,23 +82,14 @@ public class OpenRasterFileFormatConversion {
             imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
             outputStream = resolver.openOutputStream(Objects.requireNonNull(imageUri));
         } else {
-            File file = new File(Constants.MEDIA_DIRECTORY, fileName);
+
             outputStream = new FileOutputStream(file);
 
-            ContentValues contentValues = new ContentValues();
             contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/catrobat-image");
+            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/openraster");
 
             long date = System.currentTimeMillis();
             contentValues.put(MediaStore.MediaColumns.DATE_MODIFIED, date / 1000);
-
-            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-//            fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
-//
-//
-//
-//
-            imageUri = Uri.fromFile(file);
         }
 
         ZipOutputStream streamZip = new ZipOutputStream(outputStream);
@@ -108,8 +101,9 @@ public class OpenRasterFileFormatConversion {
         byte[] xmlByteArray = getXmlStack(bitmapList);
         streamZip.write(xmlByteArray, 0, xmlByteArray.length);
 
+
         String mimetype = "image/openraster";
-        byte[] mimeByteArray = mimetype.getBytes();             //check
+        byte[] mimeByteArray = mimetype.getBytes(); //check
         streamZip.write(mimeByteArray, 0, mimeByteArray.length);
 
         int counter = 0;
@@ -119,6 +113,7 @@ public class OpenRasterFileFormatConversion {
             byte[] byteArray = bos.toByteArray();
 
             streamZip.putNextEntry(new ZipEntry("data/layer" + counter + ".png"));
+            wholeSize += byteArray.length;
             streamZip.write(byteArray, 0, byteArray.length);
 
             counter++;
@@ -135,14 +130,27 @@ public class OpenRasterFileFormatConversion {
         ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
         bitmapthumb.compress(Bitmap.CompressFormat.PNG, 100, bos2);
         byte[] bitmapThumbArray = bos2.toByteArray();
+
         streamZip.write(bitmapThumbArray, 0, bitmapThumbArray.length);
 
         streamZip.putNextEntry(new ZipEntry("mergedimage.png"));
         streamZip.write(bitmapByteArray, 0, bitmapByteArray.length);
 
-        outputStream.close();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            wholeSize += xmlByteArray.length;
+            wholeSize += mimeByteArray.length;
+            wholeSize += bitmapByteArray.length;
+            wholeSize += bitmapThumbArray.length;
+            contentValues.put(MediaStore.Images.Media.SIZE, wholeSize);
+            imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            imageUri = Uri.fromFile(file);
+            outputStream.close();
 
-        return imageUri;
+            return imageUri;
+        } else {
+            outputStream.close();
+            return imageUri;
+        }
     }
 
     private static byte[] getXmlStack(List<Bitmap> bitmapList) {
