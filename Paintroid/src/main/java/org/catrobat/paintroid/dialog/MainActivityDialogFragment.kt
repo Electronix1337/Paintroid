@@ -18,18 +18,19 @@
  */
 package org.catrobat.paintroid.dialog
 
-import android.annotation.SuppressLint
-import android.content.Context
-import androidx.appcompat.app.AlertDialog
-import org.catrobat.paintroid.R
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatDialogFragment
+import org.catrobat.paintroid.contract.MainActivityContracts
+import org.catrobat.paintroid.contract.MainActivityContracts.MainView
 
-object IndeterminateProgressDialog {
-	@JvmStatic
-	@SuppressLint("InflateParams")
-	fun newInstance(context: Context?): AlertDialog {
-		return AlertDialog.Builder(context!!, R.style.PocketPaintProgressDialog)
-			.setCancelable(false)
-			.setView(R.layout.pocketpaint_layout_indeterminate)
-			.create()
-	}
+open class MainActivityDialogFragment : AppCompatDialogFragment() {
+    lateinit var presenter: MainActivityContracts.Presenter
+        private set
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        val activity = activity as MainView?
+            ?: throw IllegalArgumentException("Parent activity must implement MainActivityContracts.MainView")
+        presenter = activity.presenter
+    }
 }

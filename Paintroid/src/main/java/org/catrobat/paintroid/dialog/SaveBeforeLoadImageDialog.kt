@@ -18,18 +18,23 @@
  */
 package org.catrobat.paintroid.dialog
 
-import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Dialog
+import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import org.catrobat.paintroid.R
 
-object IndeterminateProgressDialog {
-	@JvmStatic
-	@SuppressLint("InflateParams")
-	fun newInstance(context: Context?): AlertDialog {
-		return AlertDialog.Builder(context!!, R.style.PocketPaintProgressDialog)
-			.setCancelable(false)
-			.setView(R.layout.pocketpaint_layout_indeterminate)
-			.create()
-	}
+class SaveBeforeLoadImageDialog : MainActivityDialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireActivity(), R.style.PocketPaintAlertDialog)
+            .setTitle(R.string.menu_load_image)
+            .setMessage(R.string.dialog_warning_new_image)
+            .setPositiveButton(R.string.save_button_text) { _, _ -> presenter.saveBeforeLoadImage() }
+            .setNegativeButton(R.string.discard_button_text) { _, _ -> presenter.loadNewImage() }
+            .create()
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(): SaveBeforeLoadImageDialog = SaveBeforeLoadImageDialog()
+    }
 }

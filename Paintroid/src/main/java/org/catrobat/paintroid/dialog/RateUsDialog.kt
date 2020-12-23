@@ -19,17 +19,26 @@
 package org.catrobat.paintroid.dialog
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Dialog
+import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import org.catrobat.paintroid.R
 
-object IndeterminateProgressDialog {
-	@JvmStatic
-	@SuppressLint("InflateParams")
-	fun newInstance(context: Context?): AlertDialog {
-		return AlertDialog.Builder(context!!, R.style.PocketPaintProgressDialog)
-			.setCancelable(false)
-			.setView(R.layout.pocketpaint_layout_indeterminate)
-			.create()
-	}
+class RateUsDialog : MainActivityDialogFragment() {
+    @SuppressLint("InflateParams")
+    override fun onCreateDialog(savedInstanceState: Bundle?):
+        Dialog = AlertDialog.Builder(requireContext(), R.style.PocketPaintAlertDialog)
+        .setMessage(getString(R.string.pocketpaint_rate_us))
+        .setTitle(getString(R.string.pocketpaint_rate_us_title))
+        .setPositiveButton(R.string.pocketpaint_yes) { _, _ ->
+            presenter.rateUsClicked()
+            dismiss()
+        }
+        .setNegativeButton(R.string.pocketpaint_not_now) { _, _ -> dismiss() }
+        .create()
+
+    companion object {
+        @JvmStatic
+        fun newInstance(): RateUsDialog = RateUsDialog()
+    }
 }

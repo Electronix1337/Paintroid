@@ -56,7 +56,6 @@ import org.catrobat.paintroid.dialog.PermissionInfoDialog;
 import org.catrobat.paintroid.dialog.PngInfoDialog;
 import org.catrobat.paintroid.dialog.RateUsDialog;
 import org.catrobat.paintroid.dialog.SaveBeforeFinishDialog;
-import org.catrobat.paintroid.dialog.SaveBeforeFinishDialog.SaveBeforeFinishDialogType;
 import org.catrobat.paintroid.dialog.SaveBeforeLoadImageDialog;
 import org.catrobat.paintroid.dialog.SaveBeforeNewImageDialog;
 import org.catrobat.paintroid.dialog.SaveInformationDialog;
@@ -240,7 +239,7 @@ public class MainActivityNavigator implements MainActivityContracts.Navigator {
 
 	@Override
 	public void showRateUsDialog() {
-		RateUsDialog rateUsDialog = RateUsDialog.newInstance();
+		RateUsDialog rateUsDialog = RateUsDialog.Companion.newInstance();
 		rateUsDialog.show(mainActivity.getSupportFragmentManager(), Constants.RATE_US_DIALOG_FRAGMENT_TAG);
 	}
 
@@ -338,13 +337,13 @@ public class MainActivityNavigator implements MainActivityContracts.Navigator {
 
 	@Override
 	public void showRequestPermissionRationaleDialog(PermissionInfoDialog.PermissionType permissionType, String[] permissions, int requestCode) {
-		AppCompatDialogFragment dialog = PermissionInfoDialog.newInstance(permissionType, permissions, requestCode);
+		AppCompatDialogFragment dialog = PermissionInfoDialog.Companion.newInstance(permissionType, permissions, requestCode);
 		showDialogFragmentSafely(dialog, Constants.PERMISSION_DIALOG_FRAGMENT_TAG);
 	}
 
 	@Override
 	public void showRequestPermanentlyDeniedPermissionRationaleDialog() {
-		AppCompatDialogFragment dialog = PermanentDenialPermissionInfoDialog.newInstance(mainActivity.getPackageName());
+		AppCompatDialogFragment dialog = PermanentDenialPermissionInfoDialog.Companion.newInstance(mainActivity.getPackageName());
 		showDialogFragmentSafely(dialog, Constants.PERMISSION_DIALOG_FRAGMENT_TAG);
 	}
 
@@ -380,20 +379,20 @@ public class MainActivityNavigator implements MainActivityContracts.Navigator {
 
 	@Override
 	public void showSaveBeforeFinishDialog() {
-		AppCompatDialogFragment dialog = SaveBeforeFinishDialog.newInstance(
-				SaveBeforeFinishDialogType.FINISH);
+		AppCompatDialogFragment dialog = SaveBeforeFinishDialog.Companion.newInstance(
+				SaveBeforeFinishDialog.SaveBeforeFinishDialogType.FINISH);
 		showDialogFragmentSafely(dialog, Constants.SAVE_QUESTION_FRAGMENT_TAG);
 	}
 
 	@Override
 	public void showSaveBeforeNewImageDialog() {
-		AppCompatDialogFragment dialog = SaveBeforeNewImageDialog.newInstance();
+		AppCompatDialogFragment dialog = SaveBeforeNewImageDialog.Companion.newInstance();
 		showDialogFragmentSafely(dialog, Constants.SAVE_QUESTION_FRAGMENT_TAG);
 	}
 
 	@Override
 	public void showSaveBeforeLoadImageDialog() {
-		AppCompatDialogFragment dialog = SaveBeforeLoadImageDialog.newInstance();
+		AppCompatDialogFragment dialog = SaveBeforeLoadImageDialog.Companion.newInstance();
 		showDialogFragmentSafely(dialog, Constants.SAVE_QUESTION_FRAGMENT_TAG);
 	}
 

@@ -18,25 +18,37 @@
  */
 package org.catrobat.paintroid.dialog
 
-import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.core.os.bundleOf
 import org.catrobat.paintroid.R
 
-class FeedbackDialog : AppCompatDialogFragment() {
-    @SuppressLint("InflateParams")
+class PermanentDenialPermissionInfoDialog : AppCompatDialogFragment() {
+    private var context: String? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        context = requireArguments().getString("context")
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return AlertDialog.Builder(requireContext(), R.style.PocketPaintAlertDialog)
-            .setMessage(R.string.pocketpaint_feedback)
-            .setTitle(R.string.pocketpaint_rate_us_title)
-            .setPositiveButton(R.string.pocketpaint_ok) { _, _ -> dismiss() }
+            .setMessage(R.string.permission_info_permanent_denial_text)
+            .setPositiveButton(R.string.dialog_settings) { _, _ -> startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$context"))) }
+            .setNegativeButton(android.R.string.cancel, null)
             .create()
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(): FeedbackDialog = FeedbackDialog()
+        fun newInstance(context: String?): PermanentDenialPermissionInfoDialog {
+            return PermanentDenialPermissionInfoDialog().apply {
+                arguments = bundleOf("context" to context)
+            }
+        }
     }
 }

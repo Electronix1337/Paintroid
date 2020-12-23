@@ -169,7 +169,7 @@ class SaveInformationDialog :
             when {
                 FileIO.isCatrobatImage -> presenter.showOraInformationDialog()
                 FileIO.compressFormat == Bitmap.CompressFormat.JPEG -> presenter.showJpgInformationDialog()
-                else -> presenter.showPngInformationDialog()
+                else -> presenter?.showPngInformationDialog()
             }
         }
     }
