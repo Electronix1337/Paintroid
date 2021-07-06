@@ -46,8 +46,20 @@ public final class TransformToolOptionsViewInteraction extends CustomViewInterac
 		return this;
 	}
 
+	public TransformToolOptionsViewInteraction performSetCenter() {
+		onView(withId(R.id.pocketpaint_set_center))
+				.perform(click());
+		return this;
+	}
+
 	public TransformToolOptionsViewInteraction checkAutoDisplayed() {
 		onView(withText(R.string.transform_auto_crop_text))
+				.check(matches(isDisplayed()));
+		return this;
+	}
+
+	public TransformToolOptionsViewInteraction checkSetCenterDisplayed() {
+		onView(withText(R.string.transform_tool_set_center_text))
 				.check(matches(isDisplayed()));
 		return this;
 	}

@@ -262,6 +262,14 @@ public class TransformToolIntegrationTest {
 	}
 
 	@Test
+	public void testSetCenterTextIsShown() {
+		onToolBarView()
+				.performSelectTool(ToolType.TRANSFORM);
+		onTransformToolOptionsView()
+				.checkSetCenterDisplayed();
+	}
+
+	@Test
 	public void testWhenNoPixelIsOnBitmap() {
 		onToolBarView()
 				.performSelectTool(ToolType.TRANSFORM)

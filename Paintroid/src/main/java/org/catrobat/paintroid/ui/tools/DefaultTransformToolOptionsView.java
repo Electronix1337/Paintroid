@@ -85,6 +85,15 @@ public class DefaultTransformToolOptionsView implements TransformToolOptionsView
 						}
 					}
 				});
+		optionsView.findViewById(R.id.pocketpaint_set_center)
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						if (callback != null) {
+							callback.setCenterClicked();
+						}
+					}
+				});
 		optionsView.findViewById(R.id.pocketpaint_transform_rotate_left_btn)
 				.setOnClickListener(new View.OnClickListener() {
 					@Override

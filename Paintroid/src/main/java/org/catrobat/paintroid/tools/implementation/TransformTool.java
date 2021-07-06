@@ -118,6 +118,11 @@ public class TransformTool extends BaseToolWithRectangleShape {
 			}
 
 			@Override
+			public void setCenterClicked() {
+				setCenter();
+			}
+
+			@Override
 			public void rotateCounterClockwiseClicked() {
 				rotateCounterClockWise();
 			}
@@ -314,6 +319,14 @@ public class TransformTool extends BaseToolWithRectangleShape {
 				toolOptionsViewController.hide();
 			}
 		}.execute();
+	}
+
+	private void setCenter() {
+		///TODO rausfinden, was genau passieren soll, wenn der Button gedrückt wird.
+		///TODO Annahme ist, größten leeren Space auf Bitmap rausfinden und diesen als neuen Mittelpunkt setzen
+		///TODO Oder ähnlich wie bei Scratch, Mittelpunkt für ganzes Bild setzen, für Rotationen etc.
+
+
 	}
 
 	private boolean areResizeBordersValid() {

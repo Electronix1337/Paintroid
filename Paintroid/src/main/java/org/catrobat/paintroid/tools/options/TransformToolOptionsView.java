@@ -35,6 +35,8 @@ public interface TransformToolOptionsView {
 	interface Callback {
 		void autoCropClicked();
 
+		void setCenterClicked();
+
 		void rotateCounterClockwiseClicked();
 
 		void rotateClockwiseClicked();

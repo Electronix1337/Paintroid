@@ -38,16 +38,28 @@
         <LinearLayout style="@style/PocketPaintToolSection">
 
             <Button
+                    android:id="@+id/pocketpaint_set_center"
+                    style="?android:borderlessButtonStyle"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/transform_tool_set_center_text"
+                    android:drawableTop="@drawable/ic_pocketpaint_set_center"
+                    android:text="@string/transform_tool_set_center_text"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="?attr/colorAccent"
+                    android:textSize="12sp" />
+
+            <Button
                 android:id="@+id/pocketpaint_transform_auto_crop_btn"
                 style="?android:borderlessButtonStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/transform_tool_auto_crop_text"
                 android:drawableTop="@drawable/ic_pocketpaint_tool_resize_adjust"
                 android:text="@string/transform_auto_crop_text"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="?attr/colorAccent"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <Space style="@style/PocketPaintToolHorizontalSpace" />
 
@@ -58,7 +70,7 @@
                 android:labelFor="@+id/pocketpaint_transform_width_value"
                 android:text="@string/transform_width_text"
                 android:textColor="?attr/colorAccent"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <EditText
                 android:id="@+id/pocketpaint_transform_width_value"
@@ -69,7 +81,7 @@
                 android:inputType="number"
                 android:textAlignment="textEnd"
                 android:textColor="?attr/colorAccent"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 tools:text="100"
                 android:importantForAutofill="no" />
@@ -79,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/pixel"
                 android:textColor="?attr/colorAccent"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <Space style="@style/PocketPaintToolHorizontalSpace"
                 android:layout_width="16dp" />
@@ -91,7 +103,7 @@
                 android:labelFor="@+id/pocketpaint_transform_height_value"
                 android:text="@string/transform_height_text"
                 android:textColor="?attr/colorAccent"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <EditText
                 android:id="@+id/pocketpaint_transform_height_value"
@@ -102,7 +114,7 @@
                 android:inputType="number"
                 android:textAlignment="textEnd"
                 android:textColor="?attr/colorAccent"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 tools:text="100"
                 android:importantForAutofill="no" />
@@ -112,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/pixel"
                 android:textColor="?attr/colorAccent"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <Space style="@style/PocketPaintToolHorizontalSpace" />
         </LinearLayout>
